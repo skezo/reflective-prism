@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Quick VR Mockups</title>
+<title>Reflective Prism</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -13,16 +13,26 @@
 		margin: 0;
 		padding: 0; 
 		overflow: hidden;
+		position: relative;
 	}
-	canvas {
-		/*-webkit-transform: rotate(45deg);
-		transform: rotate(45deg);*/
+	p {	
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: #ff0000;
+		z-index: 100;
+		font-size: 18px;
+		line-height: 1;
+		pointer-events: none;
+  		-webkit-user-select: none;
 	}
+
 </style>
 </head>
 
 <body>
-
+<p>+</p>
 <script src="js/three.js"></script>
 
 <script>
@@ -52,7 +62,7 @@ var views = [
 		bottom: 0,
 		width: 0.5,
 		height: 0.5,
-		background: new THREE.Color().setRGB( 0, 0.5, 0.7 ),
+		background: new THREE.Color().setRGB( 0, 0, 0 ),
 		eye: [ 0, 300, 1800 ],
 		up: [ 0, 1, 0 ],
 		fov: 30,
@@ -64,7 +74,7 @@ var views = [
 		bottom: 0,
 		width: 0.5,
 		height: 0.5,
-		background: new THREE.Color().setRGB( 0.7, 0.5, 0.5 ),
+		background: new THREE.Color().setRGB( 0, 0, 0 ),
 		eye: [ 0, 300, 1800 ],
 		up: [ 0, 1, 0 ],
 		fov: 30,
@@ -76,7 +86,7 @@ var views = [
 		bottom: 0.5,
 		width: 0.5,
 		height: 0.5,
-		background: new THREE.Color().setRGB( 0.5, 0.7, 0.7 ),
+		background: new THREE.Color().setRGB( 0, 0, 0 ),
 		eye: [ 0, 300, 1800 ],
 		up: [ 0, 1, 0 ],
 		fov: 30,
@@ -170,8 +180,6 @@ function render() {
 // Kick off animation loop
 animate();
 
-
-
 // Handle window resizes
 function onWindowResize() {
 	
@@ -189,6 +197,21 @@ function onWindowResize() {
 }
 
 window.addEventListener('resize', onWindowResize, false);
+
+//Request Fullscreen
+var container = document.body;
+function fullscreen() {
+  if (container.requestFullscreen) {
+    container.requestFullscreen();
+  } else if (container.msRequestFullscreen) {
+    container.msRequestFullscreen();
+  } else if (container.mozRequestFullScreen) {
+    container.mozRequestFullScreen();
+  } else if (container.webkitRequestFullscreen) {
+    container.webkitRequestFullscreen();
+  }
+}
+container.addEventListener('click', fullscreen, false);
 
 </script>
 </body>
