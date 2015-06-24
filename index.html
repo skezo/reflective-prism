@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Quick VR Mockups</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<style type="text/css">
+	html, body {
+		background-color: #000;
+		margin: 0;
+		padding: 0; 
+		overflow: hidden;
+	}
+	canvas {
+		/*-webkit-transform: rotate(45deg);
+		transform: rotate(45deg);*/
+	}
+</style>
+</head>
+
+<body>
+
+<script src="js/three.js"></script>
+
+<script>
+var windowWidth = window.innerWidth;
+var windowHeight = window.innerHeight;
+var cameraRadius = 290
+var rotateY = 90;
+var rotateX = 0;
+var curY = 0;
+
+//Create Views
+var views = [
+	{//TOP LEFT
+		left: 0,
+		bottom: 0.5,
+		width: 0.5,
+		height: 0.5,
+		background: new THREE.Color().setRGB( 0, 0, 0 ),
+		eye: [ 0, 300, 1800 ],
+		up: [ 0, 1, 0 ],
+		fov: 30,
+		angle : 0,
+		rotation: 33.75
+	},
+	{//BOTTOM LEFT
+		left: 0,
+		bottom: 0,
+		width: 0.5,
+		height: 0.5,
+		background: new THREE.Color().setRGB( 0, 0.5, 0.7 ),
+		eye: [ 0, 300, 1800 ],
+		up: [ 0, 1, 0 ],
+		fov: 30,
+		angle: 90,
+		rotation: 101.25
+	},
+	{ 
+		left: 0.5,
+		bottom: 0,
+		width: 0.5,
+		height: 0.5,
+		background: new THREE.Color().setRGB( 0.7, 0.5, 0.5 ),
+		eye: [ 0, 300, 1800 ],
+		up: [ 0, 1, 0 ],
+		fov: 30,
+		angle: 180,
+		rotation: -101.25
+	},
+	{ 
+		left: 0.5,
+		bottom: 0.5,
+		width: 0.5,
+		height: 0.5,
+		background: new THREE.Color().setRGB( 0.5, 0.7, 0.7 ),
+		eye: [ 0, 300, 1800 ],
+		up: [ 0, 1, 0 ],
+		fov: 30,
+		angle: 270,
+		rotation: 101.25
+	}
+];
+
+//Setup three.js WebGL renderer
+var renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+// Append the canvas element created by the renderer to document body element.
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+
+
+
+// Create a three.js scene.
+var scene = new THREE.Scene();
+
+
+//Create all Cameras
+for (var ii =  0; ii < views.length; ++ii ) {
+	var view = views[ii];
+	var camera = new THREE.PerspectiveCamera( view.fov, window.innerWidth / window.innerHeight, 0.3, 10000 );
+	camera.position.x = view.eye[ 0 ];
+	camera.position.y = view.eye[ 1 ];
+	camera.position.z = view.eye[ 2 ];
+	camera.up.x = view.up[ 0 ];
+	camera.up.y = view.up[ 1 ];
+	camera.up.z = view.up[ 2 ];
+	view.camera = camera;
+}
+
+//Add Object
+var geometry = new THREE.SphereGeometry(50, 40, 40)
+var material = new THREE.MeshBasicMaterial( { 
+	transparent: true, 
+	side: THREE.DoubleSide,
+	map: THREE.ImageUtils.loadTexture( 'img/background.png' )
+});
+var sphere = new THREE.Mesh( geometry, material );
+scene.add( sphere );
+
+
+
+// Request animation frame loop function
+function animate() {
+	render();
+	requestAnimationFrame(animate);
+}
+
+function render() {
+
+
+	for ( var ii = 0; ii < views.length; ++ii ) {
+		var view = views[ii];
+		var camera = view.camera;
+
+		//Adjust camera within 3D spherical coordinates
+		camera.position.x = sphere.position.x + cameraRadius * Math.sin(rotateY * Math.PI/180) * Math.cos(view.angle * Math.PI/180)
+		camera.position.z = sphere.position.y + cameraRadius * Math.sin(rotateY * Math.PI/180) * Math.sin(view.angle * Math.PI/180)
+		camera.position.y = sphere.position.z + cameraRadius * Math.cos(rotateY * Math.PI/180)
+		camera.lookAt(scene.position)
+
+		//Set rotation of camera on Z-Axis
+		camera.rotation.z= view.rotation - Math.PI;
+		
+		//Grab view ports
+		var left   = Math.floor( windowWidth  * view.left );
+		var bottom = Math.floor( windowHeight * view.bottom );
+		var width  = Math.floor( windowWidth  * view.width );
+		var height = Math.floor( windowHeight * view.height );
+
+		//Render
+		renderer.setViewport( left, bottom, width, height );
+		renderer.setScissor( left, bottom, width, height );
+		renderer.enableScissorTest ( true );
+		renderer.setClearColor( view.background );
+
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
+		
+		renderer.render(scene, camera)
+	}
+
+}
+
+
+// Kick off animation loop
+animate();
+
+
+
+// Handle window resizes
+function onWindowResize() {
+	
+	windowWidth = window.innerWidth;
+	windowHeight = window.innerHeight;
+
+	for ( var ii = 0; ii < views.length; ++ii ) {
+		var view = views[ii];
+		var camera = view.camera;
+		camera.aspect = windowWidth / windowHeight;
+		camera.updateProjectionMatrix();
+	}
+
+	renderer.setSize( windowWidth, windowHeight );
+}
+
+window.addEventListener('resize', onWindowResize, false);
+
+</script>
+</body>
+</html>
