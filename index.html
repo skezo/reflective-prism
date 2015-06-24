@@ -124,9 +124,10 @@ for (var ii =  0; ii < views.length; ++ii ) {
 
 //Add Object
 var geometry = new THREE.SphereGeometry(50, 40, 40)
-var material = new THREE.MeshPhongMaterial( { 
-	map: THREE.ImageUtils.loadTexture( 'img/map.jpg' ),
-	shading: THREE.FlatShading
+var material = new THREE.MeshBasicMaterial( { 
+	transparent: true, 
+	side: THREE.DoubleSide,
+	map: THREE.ImageUtils.loadTexture( 'img/map.jpg' )
 });
 var sphere = new THREE.Mesh( geometry, material );
 scene.add( sphere );
